@@ -8,7 +8,25 @@ export async function POST(request, { params }) {
         const { id } = await params;
         const { mystery_name, device_type } = await request.json();
 
+        // Capture IP address (and location if possible)
+        const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'Unknown';
+        let location = null;
+
+        if (ip && ip !== 'Unknown' && ip !== '::1') {
+            try {
+                const geoRes = await fetch(`http://ip-api.com/json/${ip}`);
+                const geoData = await geoRes.json();
+                if (geoData.status === 'success') {
+                    location = `${geoData.city}, ${geoData.country}`;
+                }
+            } catch (e) {
+                console.error('Geo lookup failed:', e);
+            }
+        }
+
         const updateFields = { is_accepted: true };
+        if (ip) updateFields.ip_address = ip;
+        if (location) updateFields.location = location;
         if (mystery_name) updateFields.mystery_name = mystery_name;
         if (device_type) updateFields.device_type = device_type;
 

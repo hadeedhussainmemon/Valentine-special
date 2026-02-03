@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { RefreshCw, LayoutDashboard, Lock, LogIn, Smartphone, Calendar, Search, ArrowRight } from 'lucide-react';
+import { RefreshCw, LayoutDashboard, Lock, LogIn, Smartphone, Calendar, Search, ArrowRight, Heart, Check, VolumeX } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const API_URL = '/api';
@@ -136,45 +136,72 @@ export default function AdminPage() {
                     </header>
 
                     {/* Scorecards */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Proposals</p>
-                            <p className="text-3xl font-bold text-slate-900 mt-2">{stats.length}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div className="bg-white p-6 rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100 flex flex-col justify-between h-32">
+                            <div>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Total Invites</p>
+                                <h3 className="text-3xl font-black text-slate-900">{stats.length}</h3>
+                            </div>
+                            <div className="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400">
+                                <LayoutDashboard size={20} />
+                            </div>
                         </div>
-                        <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Accepted</p>
-                            <p className="text-3xl font-bold text-green-600 mt-2">
-                                {stats.filter(s => s.is_accepted).length}
-                            </p>
+                        <div className="bg-white p-6 rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100 flex flex-col justify-between h-32">
+                            <div>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Accepted</p>
+                                <h3 className="text-3xl font-black text-emerald-500">{stats.filter(s => s.is_accepted).length}</h3>
+                            </div>
+                            <div className="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500">
+                                <Check size={20} strokeWidth={3} />
+                            </div>
                         </div>
-                        <div className="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-                            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pending</p>
-                            <p className="text-3xl font-bold text-amber-500 mt-2">
-                                {stats.filter(s => !s.is_accepted).length}
-                            </p>
+                        <div className="bg-white p-6 rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100 flex flex-col justify-between h-32">
+                            <div>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Success Rate</p>
+                                <h3 className="text-3xl font-black text-rose-500">
+                                    {stats.length > 0 ? Math.round((stats.filter(s => s.is_accepted).length / stats.length) * 100) : 0}%
+                                </h3>
+                            </div>
+                            <div className="w-10 h-10 bg-rose-50 rounded-full flex items-center justify-center text-rose-500">
+                                <Heart size={20} fill="currentColor" />
+                            </div>
+                        </div>
+                        <div className="bg-white p-6 rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100 flex flex-col justify-between h-32">
+                            <div>
+                                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">Rejected (No Clicks)</p>
+                                <h3 className="text-3xl font-black text-indigo-500">
+                                    {stats.reduce((acc, curr) => acc + curr.no_hover_count, 0)}
+                                </h3>
+                            </div>
+                            <div className="w-10 h-10 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-500">
+                                <VolumeX size={20} />
+                            </div>
                         </div>
                     </div>
 
                     {/* Professional Data Table */}
-                    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="bg-white rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.04)] border border-slate-100 overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-sm border-collapse">
                                 <thead>
-                                    <tr className="bg-slate-50 border-b border-slate-200">
-                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs whitespace-nowrap">Sender Name</th>
-                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs whitespace-nowrap">Status</th>
-                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs text-center whitespace-nowrap">Interactions</th>
-                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs whitespace-nowrap">Recipient / Mystery</th>
-                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs hidden md:table-cell whitespace-nowrap">Device Info</th>
-                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs hidden md:table-cell whitespace-nowrap">Date</th>
+                                    <tr className="bg-slate-50/50 border-b border-slate-100">
+                                        <th className="px-6 py-4 font-bold text-slate-400 uppercase tracking-wider text-[11px] whitespace-nowrap">Sender</th>
+                                        <th className="px-6 py-4 font-bold text-slate-400 uppercase tracking-wider text-[11px] whitespace-nowrap">Status</th>
+                                        <th className="px-6 py-4 font-bold text-slate-400 uppercase tracking-wider text-[11px] text-center whitespace-nowrap">Interaction</th>
+                                        <th className="px-6 py-4 font-bold text-slate-400 uppercase tracking-wider text-[11px] whitespace-nowrap">Recipient / Mystery</th>
+                                        <th className="px-6 py-4 font-bold text-slate-400 uppercase tracking-wider text-[11px] hidden md:table-cell whitespace-nowrap">Location & IP</th>
+                                        <th className="px-6 py-4 font-bold text-slate-400 uppercase tracking-wider text-[11px] hidden md:table-cell whitespace-nowrap">Device</th>
+                                        <th className="px-6 py-4 font-bold text-slate-400 uppercase tracking-wider text-[11px] hidden md:table-cell whitespace-nowrap">Date</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {stats.length === 0 ? (
                                         <tr>
-                                            <td colSpan="6" className="px-6 py-12 text-center text-slate-400">
-                                                <div className="flex flex-col items-center">
-                                                    <Search size={32} className="mb-3 opacity-20" />
+                                            <td colSpan="7" className="px-6 py-20 text-center text-slate-400">
+                                                <div className="flex flex-col items-center gap-4">
+                                                    <div className="p-4 bg-slate-50 rounded-full">
+                                                        <Search size={24} className="opacity-40" />
+                                                    </div>
                                                     <p>No proposals found yet.</p>
                                                 </div>
                                             </td>
@@ -186,82 +213,89 @@ export default function AdminPage() {
                                                 ? stat.sender_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
                                                 : '??';
 
-                                            // Simple consistent color generation based on name length
                                             const colorClasses = [
                                                 'bg-rose-100 text-rose-600', 'bg-blue-100 text-blue-600',
-                                                'bg-green-100 text-green-600', 'bg-amber-100 text-amber-600',
+                                                'bg-emerald-100 text-emerald-600', 'bg-amber-100 text-amber-600',
                                                 'bg-purple-100 text-purple-600', 'bg-indigo-100 text-indigo-600'
                                             ];
                                             const colorClass = colorClasses[stat.sender_name.length % colorClasses.length];
 
                                             return (
-                                                <tr key={stat.id} className="group hover:bg-slate-50 transition-colors even:bg-slate-50/50">
+                                                <tr key={stat.id} className="group hover:bg-slate-50/80 transition-colors">
                                                     <td className="px-6 py-4">
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${colorClass} shrink-0`}>
+                                                            <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold ${colorClass} shrink-0 shadow-sm border border-white ring-1 ring-slate-100`}>
                                                                 {initials}
                                                             </div>
                                                             <div className="flex flex-col">
-                                                                <span className="font-medium text-slate-900 group-hover:text-blue-600 transition-colors">{stat.sender_name}</span>
-                                                                <span className="text-[10px] text-slate-400 font-mono mt-0.5" title={stat.id}>
-                                                                    ID: {stat.id.substring(0, 8)}...
+                                                                <span className="font-semibold text-slate-700">{stat.sender_name}</span>
+                                                                <span className="text-[10px] text-slate-400 font-mono" title={stat.id}>
+                                                                    ID: {stat.id.substring(0, 8)}
                                                                 </span>
                                                             </div>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4">
                                                         {stat.is_accepted ? (
-                                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700 border border-emerald-200/50">
-                                                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                                                Accepted
+                                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-700 border border-emerald-200">
+                                                                <Check size={12} strokeWidth={3} /> Accepted
                                                             </span>
                                                         ) : (
-                                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200/50">
-                                                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                                                                Pending
+                                                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-700 border border-amber-200">
+                                                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> Pending
                                                             </span>
                                                         )}
                                                     </td>
                                                     <td className="px-6 py-4 text-center">
-                                                        <div className="inline-block relative">
-                                                            <span className={`px-2.5 py-1 rounded-md text-xs font-bold block min-w-[30px] border ${stat.no_hover_count > 5
-                                                                ? 'bg-rose-50 text-rose-600 border-rose-100 ring-2 ring-rose-100/50'
+                                                        <div className="flex justify-center">
+                                                            <span className={`px-2.5 py-0.5 rounded-md text-xs font-bold border ${stat.no_hover_count > 5
+                                                                ? 'bg-rose-50 text-rose-600 border-rose-200'
                                                                 : stat.no_hover_count > 0
-                                                                    ? 'bg-blue-50 text-blue-600 border-blue-100'
-                                                                    : 'bg-slate-50 text-slate-500 border-slate-200'
+                                                                    ? 'bg-slate-100 text-slate-600 border-slate-200'
+                                                                    : 'text-slate-400 border-transparent'
                                                                 }`}>
-                                                                {stat.no_hover_count}
+                                                                {stat.no_hover_count} Rejections
                                                             </span>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4">
                                                         {stat.recipient_name ? (
-                                                            <div className="flex items-center gap-2 text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 w-fit">
-                                                                <span>💌</span>
-                                                                <span className="font-medium text-xs">For: {stat.recipient_name}</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-lg">💌</span>
+                                                                <span className="font-medium text-slate-700">{stat.recipient_name}</span>
                                                             </div>
                                                         ) : stat.mystery_name ? (
-                                                            <div className="flex items-center gap-2 text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 w-fit">
-                                                                <span>✨</span>
-                                                                <span className="font-medium text-xs">"{stat.mystery_name}"</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className="text-lg">✨</span>
+                                                                <span className="font-medium text-indigo-600">{stat.mystery_name}</span>
+                                                                <span className="text-[10px] uppercase font-bold text-indigo-300 tracking-wider">(Entered)</span>
                                                             </div>
                                                         ) : (
-                                                            <span className="text-slate-400 text-xs italic flex items-center gap-1">
-                                                                <div className="w-1 h-1 rounded-full bg-slate-300"></div>
-                                                                Waiting via ...
-                                                            </span>
+                                                            <span className="text-slate-400 text-xs italic">Waiting...</span>
                                                         )}
+                                                    </td>
+                                                    <td className="px-6 py-4 hidden md:table-cell">
+                                                        <div className="flex flex-col gap-1">
+                                                            {stat.location && (
+                                                                <span className="text-xs font-semibold text-slate-700 flex items-center gap-1">
+                                                                    🌍 {stat.location}
+                                                                </span>
+                                                            )}
+                                                            <span className="text-[10px] text-slate-400 font-mono bg-slate-50 px-1.5 py-0.5 rounded w-fit border border-slate-100">
+                                                                {stat.ip_address || '---'}
+                                                            </span>
+                                                        </div>
                                                     </td>
                                                     <td className="px-6 py-4 hidden md:table-cell">
                                                         <div className="flex items-center gap-2 text-slate-600 text-xs">
                                                             <Smartphone size={14} className="text-slate-400" />
                                                             <span className="max-w-[120px] truncate" title={stat.device_type}>
-                                                                {stat.device_type ? stat.device_type.split('(')[0].replace('Mozilla/5.0', '').trim() || 'Generic Device' : 'Unknown'}
+                                                                {stat.device_type ? stat.device_type.split('(')[0].replace('Mozilla/5.0', '').trim() || 'Device' : 'Unknown'}
                                                             </span>
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 hidden md:table-cell text-slate-500 text-xs">
-                                                        {new Date(stat.created_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                    <td className="px-6 py-4 hidden md:table-cell text-slate-400 text-xs font-medium">
+                                                        {new Date(stat.created_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short' })}
                                                     </td>
                                                 </tr>
                                             );

@@ -342,7 +342,8 @@ export default function ProposalClient({ id }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+                        className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+                        style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }}
                     >
                         <motion.div
                             initial={{ scale: 0.9, y: 20 }}
