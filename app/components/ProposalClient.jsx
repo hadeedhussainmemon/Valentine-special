@@ -117,9 +117,9 @@ export default function ProposalClient({ id }) {
 
             <button
                 onClick={toggleMusic}
-                className="fixed top-4 right-4 z-50 p-3 bg-white/50 backdrop-blur-sm rounded-full hover:bg-white transition-all text-[#FF4D6D] shadow-sm"
+                className="fixed top-4 right-4 z-50 p-3 bg-white/80 backdrop-blur-md rounded-full text-[#FF4D6D] shadow-lg border-2 border-[#FFC5D3] hover:scale-110 transition-transform"
             >
-                {isPlaying ? <Volume2 /> : <VolumeX />}
+                {isPlaying ? <Volume2 size={24} /> : <VolumeX size={24} />}
             </button>
 
             <AnimatePresence mode="wait">
@@ -130,7 +130,7 @@ export default function ProposalClient({ id }) {
                         <motion.div
                             initial={{ scale: 0.9, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className="glass-card w-full text-center"
+                            className="glass-card w-full text-center flex flex-col items-center"
                         >
                             <h1 className="text-4xl md:text-6xl mb-4 text-[#FF4D6D] drop-shadow-sm font-bold">Will you be my Valentine?</h1>
                             <p className="mb-6 text-[#800F2F] text-lg font-medium opacity-80">Official invite from your admirer 💌</p>
@@ -255,9 +255,9 @@ export default function ProposalClient({ id }) {
                         <motion.div
                             initial={{ scale: 0.9 }}
                             whileInView={{ scale: 1 }}
-                            className="text-center pb-20"
+                            className="w-full text-center pb-20 flex flex-col items-center justify-center"
                         >
-                            <p className="text-2xl font-bold text-[#FF4D6D] mb-6">So... what do you say?</p>
+                            <p className="text-3xl font-bold text-[#FF4D6D] mb-8 font-handwriting">So... what do you say?</p>
                             <button
                                 className="btn btn-primary shadow-xl px-12 py-5 text-2xl animate-bounce"
                                 onClick={handleYes}
