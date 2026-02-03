@@ -8,7 +8,8 @@ import { Heart, Volume2, VolumeX } from 'lucide-react';
 
 const API_URL = '/api';
 // Romantic Piano Music
-const MUSIC_URL = "https://cdn.pixabay.com/audio/2022/03/09/audio_a77a9497e7.mp3"; // "Relaxing Piano Music" - Public Domain
+// Romantic Piano Music - reliable hosting
+const MUSIC_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3";
 
 export default function ProposalClient({ id }) {
     const [proposal, setProposal] = useState(null);
