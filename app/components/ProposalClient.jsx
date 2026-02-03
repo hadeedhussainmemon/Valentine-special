@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX } from 'lucide-react';
 
 const API_URL = '/api';
 const MUSIC_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3";
@@ -12,228 +12,162 @@ const MUSIC_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3
 export default function ProposalClient({ id }) {
     const [proposal, setProposal] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [noCount, setNoCount] = useState(0);
     const [accepted, setAccepted] = useState(false);
+    const [noCount, setNoCount] = useState(0);
     const [noPosition, setNoPosition] = useState({ x: 0, y: 0 });
-    const [mysteryName, setMysteryName] = useState('');
-    const [submittedName, setSubmittedName] = useState(false);
 
-    // Music State
+    // Audio
     const audioRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
 
     useEffect(() => {
-        // Initialize Audio
         audioRef.current = new Audio(MUSIC_URL);
         audioRef.current.loop = true;
-        audioRef.current.volume = 0.5;
 
-        const fetchProposal = async () => {
-            try {
-                // Ensure ID is valid before request
-                if (!id) throw new Error("No ID provided");
-
-                const res = await axios.get(`${API_URL}/proposals/${id}`);
+        axios.get(`${API_URL}/proposals/${id}`)
+            .then(res => {
                 setProposal(res.data);
+                if (res.data.is_accepted) setAccepted(true);
+            })
+            .catch(console.error)
+            .finally(() => setLoading(false));
 
-                if (res.data.is_accepted) {
-                    setAccepted(true);
-                    setSubmittedName(!!res.data.mystery_name);
-                }
-            } catch (err) {
-                console.error('Error fetching proposal:', err);
-                setError(err.response?.data?.error || err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (id) {
-            fetchProposal();
-        } else {
-            setLoading(false);
-            setError("Invalid Link ID");
-        }
-
-        return () => {
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current = null;
-            }
-        };
+        return () => audioRef.current?.pause();
     }, [id]);
 
     const toggleMusic = () => {
         if (!audioRef.current) return;
-        if (isPlaying) {
-            audioRef.current.pause();
-        } else {
-            audioRef.current.play().catch(e => console.log("User must interact first", e));
-        }
+        if (isPlaying) audioRef.current.pause();
+        else audioRef.current.play().catch(console.error);
         setIsPlaying(!isPlaying);
     };
 
-    const handleNoHover = async () => {
+    const handleNoHover = () => {
         setNoCount(prev => prev + 1);
-        const x = Math.random() * 200 - 100;
-        const y = Math.random() * 200 - 100;
-        setNoPosition({ x, y });
-
-        try {
-            await axios.post(`${API_URL}/proposals/${id}/interaction`);
-        } catch (error) { console.error(error); }
+        setNoPosition({
+            x: Math.random() * 200 - 100,
+            y: Math.random() * 200 - 100
+        });
+        axios.post(`${API_URL}/proposals/${id}/interaction`).catch(console.error);
     };
 
-    const handleYesClick = async () => {
+    const handleYes = () => {
         setAccepted(true);
         confetti({
             particleCount: 150,
             spread: 70,
             origin: { y: 0.6 },
-            colors: ['#FF4D6D', '#FF8FA3', '#FFFFFF']
+            colors: ['#FFC5D3', '#FF4D6D']
         });
-
         if (audioRef.current && !isPlaying) {
-            audioRef.current.play().then(() => setIsPlaying(true)).catch(e => console.log(e));
+            audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
         }
-
-        try {
-            await axios.post(`${API_URL}/proposals/${id}/accept`, {
-                device_type: navigator.userAgent
-            });
-        } catch (error) { console.error(error); }
+        axios.post(`${API_URL}/proposals/${id}/accept`, {}).catch(console.error);
     };
 
-    const submitMysteryName = async () => {
-        if (!mysteryName.trim()) return;
-        try {
-            await axios.post(`${API_URL}/proposals/${id}/accept`, {
-                mystery_name: mysteryName
-            });
-            setSubmittedName(true);
-            confetti({ particleCount: 50, spread: 50 });
-        } catch (error) {
-            console.error('Error submitting name:', error);
-        }
-    };
+    if (loading) return <div className="flex h-screen items-center justify-center text-[#FF4D6D] text-2xl font-bold">Loading Cuteness... 🧸</div>;
+    if (!proposal) return <div className="flex h-screen items-center justify-center text-4xl">💔</div>;
 
-    if (loading) return <div className="text-white text-center mt-20 text-2xl animate-pulse">Loading magic... ✨</div>;
-
-    if (error || !proposal) return (
-        <div className="text-white text-center mt-20">
-            <h1 className="text-4xl mb-4">💔</h1>
-            <p className="text-xl">Proposal not found or expired.</p>
-            <p className="text-sm opacity-50 mt-2">{error}</p>
-        </div>
-    );
-
-    const noScale = Math.max(0.5, 1 - noCount * 0.1);
-    const yesScale = Math.min(2, 1 + noCount * 0.2);
+    const yesScale = Math.min(1.5, 1 + noCount * 0.1);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4 overflow-hidden relative w-full">
+        <div className="flex flex-col items-center justify-center min-h-screen p-4">
             <button
                 onClick={toggleMusic}
-                className="absolute top-4 right-4 z-50 p-3 bg-white/20 rounded-full hover:bg-white/30 transition-all backdrop-blur-md border border-white/20"
-                title={isPlaying ? "Pause Music" : "Play Music"}
+                className="absolute top-4 right-4 z-50 p-2 bg-white/50 rounded-full hover:bg-white transition-all text-[#FF4D6D]"
             >
-                {isPlaying ? <Volume2 className="text-white animate-pulse" /> : <VolumeX className="text-white/70" />}
+                {isPlaying ? <Volume2 /> : <VolumeX />}
             </button>
 
             <AnimatePresence mode="wait">
                 {!accepted ? (
                     <motion.div
-                        key="question"
-                        initial={{ scale: 0.8, opacity: 0 }}
+                        key="ask"
+                        initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        exit={{ scale: 1.5, opacity: 0 }}
-                        className="glass-card z-10"
+                        exit={{ opacity: 0 }}
+                        className="glass-card max-w-lg w-full"
                     >
-                        <Heart className="w-16 h-16 text-primary mx-auto mb-4 animate-bounce" fill="#FF4D6D" strokeWidth={0} />
-                        <h1 className="mb-8">{proposal.sender_name} asks...</h1>
-                        <p className="text-3xl font-bold mb-12">Will you be my Valentine? 🌹</p>
+                        <h1 className="text-4xl md:text-5xl mb-2 text-[#FF4D6D] drop-shadow-sm font-fredoka">Will you be my Valentine?</h1>
+                        <p className="mb-6 text-gray-500 text-sm">Official invite from your admirer 💌</p>
 
-                        <div className="flex flex-col md:flex-row gap-6 justify-center items-center h-24">
+                        <img
+                            src="https://media.tenor.com/N2oqtqaB_G0AAAAi/peach-goma-phone.gif"
+                            className="w-48 mx-auto mb-8 rounded-xl object-cover floating-sticker"
+                        />
+
+                        <div className="flex justify-center gap-4 relative h-20 items-center">
                             <motion.button
-                                className="btn btn-primary text-xl px-8 py-3 rounded-full"
+                                className="btn btn-primary shadow-xl"
                                 style={{ transform: `scale(${yesScale})` }}
                                 whileHover={{ scale: yesScale * 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={handleYesClick}
+                                onClick={handleYes}
                             >
-                                YES! ❤️
+                                YES! 💖
                             </motion.button>
 
                             <motion.button
-                                className="btn bg-gray-500 text-white text-sm px-4 py-2 rounded-full absolute"
+                                className="btn bg-gray-300 text-gray-600 absolute"
                                 style={{
-                                    transform: `translate(${noPosition.x}px, ${noPosition.y}px) scale(${noScale})`,
-                                    position: 'relative'
+                                    transform: `translate(${noPosition.x}px, ${noPosition.y}px)`,
+                                    position: 'relative' // Keeps it in flow initially, but transform moves it
                                 }}
                                 animate={{ x: noPosition.x, y: noPosition.y }}
-                                transition={{ type: "spring", stiffness: 300, damping: 20 }}
                                 onMouseEnter={handleNoHover}
-                                onClick={handleNoHover}
                             >
-                                No 💔
+                                No 🙄
                             </motion.button>
+                        </div>
+
+                        {/* Date Ideas Section */}
+                        <div className="mt-12 text-left">
+                            <h3 className="text-[#FF4D6D] font-bold mb-4 text-xl">Our Virtual Date Ideas 📱</h3>
+                            <div className="date-idea">
+                                <span className="text-2xl">🎬</span>
+                                <div>
+                                    <p className="font-bold text-gray-700">Netflix Party + Video Call</p>
+                                    <p className="text-xs text-gray-500">(I'll let you pick the movie... maybe)</p>
+                                </div>
+                            </div>
+                            <div className="date-idea">
+                                <span className="text-2xl">🍕</span>
+                                <div>
+                                    <p className="font-bold text-gray-700">Order Food & Eat Together</p>
+                                    <p className="text-xs text-gray-500">(Pizza? Sushi? You decide!)</p>
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
                 ) : (
                     <motion.div
                         key="success"
-                        initial={{ scale: 0.5, opacity: 0 }}
+                        initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="glass-card z-10 max-w-lg"
+                        className="glass-card max-w-lg w-full"
                     >
-                        <h1 className="text-5xl mb-4">Yay! ❤️</h1>
-                        <p className="text-xl mb-6">You've made {proposal.sender_name} the happiest person!</p>
+                        <h1 className="text-4xl mb-2 text-[#FF4D6D]">Good choice babu 😌</h1>
+                        <p className="text-gray-600 mb-8">You just unlocked unlimited hugs, kisses, and cuddles!</p>
+
+                        <div className="flex justify-center gap-4 mb-8">
+                            <img src="https://media.tenor.com/gUiu1zyxfzYAAAAi/bear-kiss-bear-kisses.gif" className="w-32 rounded-xl shadow-md border-2 border-white" />
+                            <img src="https://media.tenor.com/gm_5C8aXbEkAAAAi/peach-goma.gif" className="w-32 rounded-xl shadow-md border-2 border-white" />
+                        </div>
 
                         {proposal.custom_message && (
-                            <div className="bg-white/10 p-6 rounded-xl border border-white/20 mb-8 transform rotate-1 hover:rotate-0 transition-transform duration-500">
-                                <p className="text-xs uppercase tracking-widest opacity-50 mb-2">Secret Message from {proposal.sender_name}:</p>
-                                <p className="font-handwriting text-2xl italic leading-relaxed" style={{ fontFamily: 'Great Vibes, cursive' }}>
-                                    "{proposal.custom_message}"
-                                </p>
+                            <div className="bg-[#FFF0F3] p-4 rounded-xl border border-[#FFC5D3] mb-8">
+                                <p className="font-handwriting text-2xl text-[#800F2F]">"{proposal.custom_message}"</p>
                             </div>
                         )}
 
-                        {!submittedName && !proposal.mystery_name ? (
-                            <div className="mt-8 pt-8 border-t border-white/10">
-                                <p className="mb-4 text-sm opacity-80">Who is this wonderful person? (Optional)</p>
-                                <div className="flex gap-2 justify-center">
-                                    <input
-                                        type="text"
-                                        placeholder="Your Name"
-                                        value={mysteryName}
-                                        onChange={(e) => setMysteryName(e.target.value)}
-                                        className="max-w-[200px]"
-                                    />
-                                    <button
-                                        className="btn btn-primary"
-                                        onClick={submitMysteryName}
-                                    >
-                                        Reveal 🎭
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                            <p className="mt-8 text-white/60 italic">
-                                ~ {proposal.mystery_name || submittedName ? mysteryName : 'A Mysterious Admirer'} ~
-                            </p>
-                        )}
+                        <p className="font-bold text-[#FF4D6D] text-lg mb-8">Now you're stuck with me forever ∞</p>
+
+                        <div className="bg-gray-50 p-4 rounded-xl">
+                            <p className="text-xs text-gray-400 mb-2">Wait... do you want to change your mind? 🤔</p>
+                            <button className="btn bg-gray-200 text-gray-400 text-sm cursor-not-allowed">Actually... No 😈</button>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            {/* Background Animations */}
-            <Heart className="heart" style={{ left: '10%', animationDelay: '0s' }} size={30} />
-            <Heart className="heart" style={{ left: '30%', animationDelay: '2s' }} size={40} />
-            <Heart className="heart" style={{ left: '70%', animationDelay: '4s' }} size={25} />
-            <Heart className="heart" style={{ left: '90%', animationDelay: '1s' }} size={35} />
-            <div className="unicorn" style={{ animationDelay: '0s', left: '10%' }}>🦄</div>
-            <div className="unicorn" style={{ animationDelay: '5s', left: '50%' }}>🦄</div>
         </div>
     );
 }
