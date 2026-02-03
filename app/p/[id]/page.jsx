@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }) {
     await connectDB();
-    const { id } = params;
+    const { id } = await params;
     const proposal = await Proposal.findOne({ id });
 
     if (!proposal) {
@@ -53,7 +53,8 @@ export async function generateMetadata({ params }) {
     };
 }
 
-export default function Page({ params }) {
+export default async function Page({ params }) {
     // Pass the ID to the client component
-    return <ProposalClient id={params.id} />;
+    const { id } = await params;
+    return <ProposalClient id={id} />;
 }

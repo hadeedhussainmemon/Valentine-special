@@ -4,7 +4,7 @@ import { connectDB, Proposal } from '@/lib/mongodb';
 export async function POST(request, { params }) {
     try {
         await connectDB();
-        const { id } = params;
+        const { id } = await params;
         const { mystery_name, device_type } = await request.json();
 
         const updateFields = { is_accepted: true };
