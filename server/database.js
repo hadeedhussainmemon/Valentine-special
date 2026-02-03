@@ -1,15 +1,36 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 
-// Connect to MongoDB
+let cached = global.mongoose;
+
+if (!cached) {
+    cached = global.mongoose = { conn: null, promise: null };
+}
+
 const connectDB = async () => {
-    try {
-        const conn = await mongoose.connect(process.env.MONGODB_URI);
-        console.log(`MongoDB Connected: ${conn.connection.host}`);
-    } catch (error) {
-        console.error(`Error: ${error.message}`);
-        process.exit(1);
+    if (cached.conn) {
+        return cached.conn;
     }
+
+    if (!cached.promise) {
+        const opts = {
+            bufferCommands: false, // Disable Mongoose buffering
+        };
+
+        cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => {
+            console.log('MongoDB Connected');
+            return mongoose;
+        });
+    }
+
+    try {
+        cached.conn = await cached.promise;
+    } catch (e) {
+        cached.promise = null;
+        throw e;
+    }
+
+    return cached.conn;
 };
 
 // Define Schema

@@ -12,11 +12,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Connect to Database
-connectDB();
+// Connect to Database (Optimized for Serverless)
+// No top-level await here to avoid blocking cold start unnecessarily
 
 // 1. Create Proposal (Sender Name -> Link ID)
 app.post('/api/proposals', async (req, res) => {
+    await connectDB();
     const { sender_name, custom_message } = req.body;
     if (!sender_name) {
         return res.status(400).json({ error: 'Sender name is required' });
@@ -33,6 +34,7 @@ app.post('/api/proposals', async (req, res) => {
 
 // 2. Get Proposal Details
 app.get('/api/proposals/:id', async (req, res) => {
+    await connectDB();
     const { id } = req.params;
     try {
         const proposal = await Proposal.findOne({ id });
@@ -47,6 +49,7 @@ app.get('/api/proposals/:id', async (req, res) => {
 
 // 3. Update "No" Hover Count
 app.post('/api/proposals/:id/interaction', async (req, res) => {
+    await connectDB();
     const { id } = req.params;
     try {
         await Proposal.updateOne({ id }, { $inc: { no_hover_count: 1 } });
@@ -58,6 +61,7 @@ app.post('/api/proposals/:id/interaction', async (req, res) => {
 
 // 4. Accept Proposal
 app.post('/api/proposals/:id/accept', async (req, res) => {
+    await connectDB();
     const { id } = req.params;
     const { mystery_name, device_type } = req.body;
 
@@ -75,6 +79,7 @@ app.post('/api/proposals/:id/accept', async (req, res) => {
 
 // 5. Admin Stats
 app.get('/api/admin/stats', async (req, res) => {
+    await connectDB();
     const adminPassword = req.headers['x-admin-password'];
     const correctPassword = process.env.ADMIN_PASSWORD || 'cupid';
 
@@ -95,6 +100,7 @@ app.use(express.static(path.join(__dirname, '../dist')));
 
 // Catch-all to serve React app with Dynamic Meta Tags
 app.get('*', async (req, res) => {
+    await connectDB(); // Ensure DB is ready for meta tag injection
     const filePath = path.join(__dirname, '../dist/index.html');
 
     // Check if it's a proposal link

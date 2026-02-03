@@ -25,7 +25,8 @@ const CreatePage = () => {
             setLink(fullLink);
         } catch (error) {
             console.error('Error creating link:', error);
-            alert('Failed to create link. Is the server running?');
+            const errorMsg = error.response?.data?.error || error.message || 'Unknown error';
+            alert(`Failed to create link: ${errorMsg}`);
         } finally {
             setLoading(false);
         }
