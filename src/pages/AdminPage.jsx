@@ -3,7 +3,7 @@ import axios from 'axios';
 import { RefreshCw, Heart, Lock, LogIn } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 
 const AdminPage = () => {
     const [stats, setStats] = useState([]);

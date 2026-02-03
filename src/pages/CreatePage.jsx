@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Heart, Copy, Check, MessageCircleHeart } from 'lucide-react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 
 const CreatePage = () => {
     const [name, setName] = useState('');

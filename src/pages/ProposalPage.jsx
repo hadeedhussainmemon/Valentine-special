@@ -5,7 +5,7 @@ import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Music, Volume2, VolumeX } from 'lucide-react';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 // Royalty-free romantic track
 const MUSIC_URL = "https://cdn.pixabay.com/download/audio/2022/10/25/audio_13b281b37b.mp3";
 
