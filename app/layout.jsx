@@ -14,10 +14,6 @@ export default function RootLayout({ children }) {
             </head>
             <body>
                 <div className="app-container">
-                    {/* Add Unicorns Globally if desired, or per page. Let's add them here for the 'app' feel */}
-                    <div className="unicorn" style={{ top: '10%', left: '10%', animationDelay: '0s' }}>🦄</div>
-                    <div className="unicorn" style={{ top: '60%', left: '80%', animationDelay: '2s' }}>🦄</div>
-                    <div className="unicorn" style={{ top: '80%', left: '20%', animationDelay: '4s' }}>🦄</div>
                     {children}
                 </div>
             </body>
