@@ -4,10 +4,51 @@ import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, Heart, Star, Sparkles, Check, ArrowDown } from 'lucide-react';
 
 const API_URL = '/api';
 const MUSIC_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3";
+
+// Floating Hearts Component
+const FloatingHearts = () => {
+    const [hearts, setHearts] = useState([]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setHearts(current => {
+                const newHeart = {
+                    id: Date.now(),
+                    left: Math.random() * 100,
+                    animationDuration: 3 + Math.random() * 4,
+                    scale: 0.5 + Math.random() * 0.5
+                };
+                return [...current.slice(-20), newHeart];
+            });
+        }, 800);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+            {hearts.map(h => (
+                <motion.div
+                    key={h.id}
+                    initial={{ y: '110vh', opacity: 0 }}
+                    animate={{ y: '-10vh', opacity: [0, 1, 0] }}
+                    transition={{ duration: h.animationDuration, ease: "linear" }}
+                    style={{
+                        position: 'absolute',
+                        left: `${h.left}%`,
+                        fontSize: `${h.scale * 2}rem`,
+                        color: 'rgba(255, 197, 211, 0.6)'
+                    }}
+                >
+                    ❤️
+                </motion.div>
+            ))}
+        </div>
+    );
+};
 
 export default function ProposalClient({ id }) {
     const [proposal, setProposal] = useState(null);
@@ -65,105 +106,208 @@ export default function ProposalClient({ id }) {
         axios.post(`${API_URL}/proposals/${id}/accept`, {}).catch(console.error);
     };
 
-    if (loading) return <div className="flex h-screen items-center justify-center text-[#FF4D6D] text-2xl font-bold">Loading Cuteness... 🧸</div>;
+    if (loading) return <div className="flex h-screen items-center justify-center text-[#FF4D6D] text-2xl font-bold font-fredoka">Loading Cuteness... 🧸</div>;
     if (!proposal) return <div className="flex h-screen items-center justify-center text-4xl">💔</div>;
 
     const yesScale = Math.min(1.5, 1 + noCount * 0.1);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="relative min-h-screen font-fredoka overflow-x-hidden pb-20">
+            <FloatingHearts />
+
             <button
                 onClick={toggleMusic}
-                className="absolute top-4 right-4 z-50 p-2 bg-white/50 rounded-full hover:bg-white transition-all text-[#FF4D6D]"
+                className="fixed top-4 right-4 z-50 p-3 bg-white/50 backdrop-blur-sm rounded-full hover:bg-white transition-all text-[#FF4D6D] shadow-sm"
             >
                 {isPlaying ? <Volume2 /> : <VolumeX />}
             </button>
 
             <AnimatePresence mode="wait">
                 {!accepted ? (
-                    <motion.div
-                        key="ask"
-                        initial={{ scale: 0.9, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="glass-card max-w-lg w-full"
-                    >
-                        <h1 className="text-4xl md:text-5xl mb-2 text-[#FF4D6D] drop-shadow-sm font-fredoka">Will you be my Valentine?</h1>
-                        <p className="mb-6 text-gray-500 text-sm">Official invite from your admirer 💌</p>
+                    <div className="flex flex-col items-center w-full max-w-2xl mx-auto px-4 pt-10 md:pt-20 space-y-24 z-10 relative">
 
-                        <img
-                            src="https://media.tenor.com/N2oqtqaB_G0AAAAi/peach-goma-phone.gif"
-                            className="w-48 mx-auto mb-8 rounded-xl object-cover floating-sticker"
-                        />
+                        {/* HERO SECTION */}
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="glass-card w-full text-center"
+                        >
+                            <h1 className="text-4xl md:text-6xl mb-4 text-[#FF4D6D] drop-shadow-sm font-bold">Will you be my Valentine?</h1>
+                            <p className="mb-6 text-gray-500 text-lg font-medium">Official invite from your admirer 💌</p>
 
-                        <div className="flex justify-center gap-4 relative h-20 items-center">
-                            <motion.button
-                                className="btn btn-primary shadow-xl"
-                                style={{ transform: `scale(${yesScale})` }}
-                                whileHover={{ scale: yesScale * 1.1 }}
+                            <img
+                                src="https://media.tenor.com/N2oqtqaB_G0AAAAi/peach-goma-phone.gif"
+                                className="w-64 mx-auto mb-8 rounded-xl object-cover floating-sticker shadow-lg"
+                            />
+
+                            <div className="flex justify-center gap-6 relative h-24 items-center">
+                                <motion.button
+                                    className="btn btn-primary shadow-xl text-xl px-10 py-4"
+                                    style={{ transform: `scale(${yesScale})` }}
+                                    whileHover={{ scale: yesScale * 1.1 }}
+                                    onClick={handleYes}
+                                >
+                                    YES! 💖
+                                </motion.button>
+
+                                <motion.button
+                                    className="btn bg-gray-200 text-gray-500 absolute font-bold"
+                                    style={{
+                                        transform: `translate(${noPosition.x}px, ${noPosition.y}px)`,
+                                        position: 'relative'
+                                    }}
+                                    animate={{ x: noPosition.x, y: noPosition.y }}
+                                    onMouseEnter={handleNoHover}
+                                >
+                                    No 🙄
+                                </motion.button>
+                            </div>
+
+                            <motion.div
+                                animate={{ y: [0, 10, 0] }}
+                                transition={{ repeat: Infinity, duration: 2 }}
+                                className="mt-8 text-[#FF8FAB] flex flex-col items-center gap-2 opacity-60"
+                            >
+                                <span className="text-xs uppercase tracking-widest font-bold">Scroll for reasons why</span>
+                                <ArrowDown size={20} />
+                            </motion.div>
+                        </motion.div>
+
+                        {/* REASONS SECTION */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="w-full"
+                        >
+                            <h2 className="text-3xl font-bold text-[#FF4D6D] text-center mb-8 flex items-center justify-center gap-2">
+                                <Sparkles size={28} /> Why I Chews You <Sparkles size={28} />
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="glass-card !bg-white/60 hover:scale-105 transition-transform">
+                                    <div className="text-4xl mb-4">🧠</div>
+                                    <h3 className="text-xl font-bold text-[#D4145A] mb-2">You're Smort</h3>
+                                    <p className="text-gray-600">Like, way smarter than me. I need you to explain movies to me.</p>
+                                </div>
+                                <div className="glass-card !bg-white/60 hover:scale-105 transition-transform">
+                                    <div className="text-4xl mb-4">🥰</div>
+                                    <h3 className="text-xl font-bold text-[#D4145A] mb-2">You're Cute</h3>
+                                    <p className="text-gray-600">Actually illegal how cute you are. I'm calling the police.</p>
+                                </div>
+                                <div className="glass-card !bg-white/60 hover:scale-105 transition-transform">
+                                    <div className="text-4xl mb-4">🥺</div>
+                                    <h3 className="text-xl font-bold text-[#D4145A] mb-2">Your Smile</h3>
+                                    <p className="text-gray-600">Literally cures my depression. Don't stop smiling pls.</p>
+                                </div>
+                                <div className="glass-card !bg-white/60 hover:scale-105 transition-transform">
+                                    <div className="text-4xl mb-4">🧸</div>
+                                    <h3 className="text-xl font-bold text-[#D4145A] mb-2">Cuddles</h3>
+                                    <p className="text-gray-600">Top tier cuddler. 10/10 would nap again.</p>
+                                </div>
+                            </div>
+                        </motion.div>
+
+                        {/* PROMISES SECTION */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="glass-card w-full"
+                        >
+                            <h2 className="text-3xl font-bold text-[#FF4D6D] text-center mb-6">My Promises To You 🤞</h2>
+                            <ul className="space-y-4 text-left max-w-md mx-auto">
+                                {[
+                                    "I will always share my french fries (maybe)",
+                                    "I will text you back in 0.005 seconds",
+                                    "I will listen to your drama",
+                                    "I will always be your #1 fan",
+                                    "I will buy you snacks without asking"
+                                ].map((promise, i) => (
+                                    <li key={i} className="flex items-center gap-3 text-gray-700 text-lg">
+                                        <div className="bg-[#FF4D6D] p-1 rounded-full text-white">
+                                            <Check size={14} strokeWidth={4} />
+                                        </div>
+                                        {promise}
+                                    </li>
+                                ))}
+                            </ul>
+                        </motion.div>
+
+                        {/* MEMORIES SECTION */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 50 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="w-full text-center"
+                        >
+                            <div className="glass-card p-8 rotate-1 hover:rotate-0 transition-transform duration-500">
+                                <h2 className="text-3xl font-bold text-[#FF4D6D] mb-4">Our Memories 📸</h2>
+                                <div className="bg-gray-100 rounded-lg h-48 flex items-center justify-center border-2 border-dashed border-[#FFB3C6] mb-4">
+                                    <p className="text-gray-400 font-medium">Imagine a super cute photo of us here</p>
+                                </div>
+                                <p className="text-gray-600 italic">"Making memories since forever 💖"</p>
+                            </div>
+                        </motion.div>
+
+                        {/* FINAL ASK */}
+                        <motion.div
+                            initial={{ scale: 0.9 }}
+                            whileInView={{ scale: 1 }}
+                            className="text-center pb-20"
+                        >
+                            <p className="text-2xl font-bold text-[#FF4D6D] mb-6">So... what do you say?</p>
+                            <button
+                                className="btn btn-primary shadow-xl px-12 py-5 text-2xl animate-bounce"
                                 onClick={handleYes}
                             >
-                                YES! 💖
-                            </motion.button>
+                                YES! I LOVE YOU! 💖
+                            </button>
+                        </motion.div>
 
-                            <motion.button
-                                className="btn bg-gray-300 text-gray-600 absolute"
-                                style={{
-                                    transform: `translate(${noPosition.x}px, ${noPosition.y}px)`,
-                                    position: 'relative' // Keeps it in flow initially, but transform moves it
-                                }}
-                                animate={{ x: noPosition.x, y: noPosition.y }}
-                                onMouseEnter={handleNoHover}
-                            >
-                                No 🙄
-                            </motion.button>
-                        </div>
-
-                        {/* Date Ideas Section */}
-                        <div className="mt-12 text-left">
-                            <h3 className="text-[#FF4D6D] font-bold mb-4 text-xl">Our Virtual Date Ideas 📱</h3>
-                            <div className="date-idea">
-                                <span className="text-2xl">🎬</span>
-                                <div>
-                                    <p className="font-bold text-gray-700">Netflix Party + Video Call</p>
-                                    <p className="text-xs text-gray-500">(I'll let you pick the movie... maybe)</p>
-                                </div>
-                            </div>
-                            <div className="date-idea">
-                                <span className="text-2xl">🍕</span>
-                                <div>
-                                    <p className="font-bold text-gray-700">Order Food & Eat Together</p>
-                                    <p className="text-xs text-gray-500">(Pizza? Sushi? You decide!)</p>
-                                </div>
-                            </div>
-                        </div>
-                    </motion.div>
+                    </div>
                 ) : (
                     <motion.div
                         key="success"
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="glass-card max-w-lg w-full"
+                        className="flex items-center justify-center min-h-screen px-4 z-10 relative"
                     >
-                        <h1 className="text-4xl mb-2 text-[#FF4D6D]">Good choice babu 😌</h1>
-                        <p className="text-gray-600 mb-8">You just unlocked unlimited hugs, kisses, and cuddles!</p>
+                        <div className="glass-card max-w-lg w-full text-center">
+                            <h1 className="text-5xl mb-4 text-[#FF4D6D] font-bold">Good choice babu 😌</h1>
+                            <p className="text-gray-600 text-xl mb-8">You just unlocked unlimited hugs, kisses, and cuddles!</p>
 
-                        <div className="flex justify-center gap-4 mb-8">
-                            <img src="https://media.tenor.com/gUiu1zyxfzYAAAAi/bear-kiss-bear-kisses.gif" className="w-32 rounded-xl shadow-md border-2 border-white" />
-                            <img src="https://media.tenor.com/gm_5C8aXbEkAAAAi/peach-goma.gif" className="w-32 rounded-xl shadow-md border-2 border-white" />
-                        </div>
-
-                        {proposal.custom_message && (
-                            <div className="bg-[#FFF0F3] p-4 rounded-xl border border-[#FFC5D3] mb-8">
-                                <p className="font-handwriting text-2xl text-[#800F2F]">"{proposal.custom_message}"</p>
+                            <div className="flex justify-center gap-4 mb-8">
+                                <img src="https://media.tenor.com/gUiu1zyxfzYAAAAi/bear-kiss-bear-kisses.gif" className="w-32 rounded-xl shadow-md border-2 border-white" />
+                                <img src="https://media.tenor.com/gm_5C8aXbEkAAAAi/peach-goma.gif" className="w-32 rounded-xl shadow-md border-2 border-white" />
                             </div>
-                        )}
 
-                        <p className="font-bold text-[#FF4D6D] text-lg mb-8">Now you're stuck with me forever ∞</p>
+                            {proposal.custom_message && (
+                                <div className="bg-[#FFF0F3] p-6 rounded-xl border border-[#FFC5D3] mb-8 shadow-inner">
+                                    <p className="font-handwriting text-3xl text-[#800F2F]">"{proposal.custom_message}"</p>
+                                </div>
+                            )}
 
-                        <div className="bg-gray-50 p-4 rounded-xl">
-                            <p className="text-xs text-gray-400 mb-2">Wait... do you want to change your mind? 🤔</p>
-                            <button className="btn bg-gray-200 text-gray-400 text-sm cursor-not-allowed">Actually... No 😈</button>
+                            <p className="font-bold text-[#FF4D6D] text-lg mb-8">Now you're stuck with me forever ∞</p>
+
+                            <div className="border-t border-gray-200 pt-6 mt-6">
+                                <h3 className="text-[#FF4D6D] font-bold mb-4 text-xl">What's Next? 📱</h3>
+                                <div className="flex flex-col gap-3">
+                                    <div className="date-idea bg-white/50">
+                                        <span className="text-2xl">🎬</span>
+                                        <div className="text-left">
+                                            <p className="font-bold text-gray-700">Netflix Party + Video Call</p>
+                                            <p className="text-xs text-gray-500">Get the popcorn ready!</p>
+                                        </div>
+                                    </div>
+                                    <div className="date-idea bg-white/50">
+                                        <span className="text-2xl">🍕</span>
+                                        <div className="text-left">
+                                            <p className="font-bold text-gray-700">Order Food & Eat Together</p>
+                                            <p className="text-xs text-gray-500">I'm paying (this time)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
                 )}
