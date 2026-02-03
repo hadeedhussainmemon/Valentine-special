@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export async function GET(request, { params }) {
     try {
         await connectDB();
-        const { id } = params;
+        const { id } = await params;
         const proposal = await Proposal.findOne({ id });
 
         if (!proposal) {
