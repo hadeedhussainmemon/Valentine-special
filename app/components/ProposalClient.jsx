@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Volume2, VolumeX } from 'lucide-react';
 
 const API_URL = '/api';
-const MUSIC_URL = "https://cdn.pixabay.com/download/audio/2022/10/25/audio_13b281b37b.mp3";
+// Romantic Piano Music
+const MUSIC_URL = "https://cdn.pixabay.com/audio/2022/03/09/audio_a77a9497e7.mp3"; // "Relaxing Piano Music" - Public Domain
 
 export default function ProposalClient({ id }) {
     const [proposal, setProposal] = useState(null);
