@@ -133,7 +133,7 @@ export default function ProposalClient({ id }) {
                             className="glass-card w-full text-center flex flex-col items-center"
                         >
                             <h1 className="text-4xl md:text-6xl mb-4 text-[#FF4D6D] drop-shadow-sm font-bold">Will you be my Valentine?</h1>
-                            <p className="mb-6 text-[#800F2F] text-lg font-medium opacity-80">Official invite from your admirer 💌</p>
+                            <p className="mb-6 text-[#800F2F] text-lg font-medium opacity-80">Official invite from {proposal.sender_name} 💌</p>
 
                             <img
                                 src="https://media.tenor.com/N2oqtqaB_G0AAAAi/peach-goma-phone.gif"
