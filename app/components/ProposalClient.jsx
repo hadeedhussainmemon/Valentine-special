@@ -158,6 +158,8 @@ export default function ProposalClient({ id }) {
                                     }}
                                     animate={{ x: noPosition.x, y: noPosition.y }}
                                     onMouseEnter={handleNoHover}
+                                    onTouchStart={handleNoHover}
+                                    onClick={handleNoHover}
                                 >
                                     No 🙄
                                 </motion.button>
