@@ -1,5 +1,7 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 let cached = global.mongoose;
 
@@ -7,7 +9,7 @@ if (!cached) {
     cached = global.mongoose = { conn: null, promise: null };
 }
 
-const connectDB = async () => {
+export const connectDB = async () => {
     if (cached.conn) {
         return cached.conn;
     }
@@ -45,6 +47,4 @@ const proposalSchema = new mongoose.Schema({
     created_at: { type: Date, default: Date.now }
 });
 
-const Proposal = mongoose.model('Proposal', proposalSchema);
-
-module.exports = { connectDB, Proposal };
+export const Proposal = mongoose.models.Proposal || mongoose.model('Proposal', proposalSchema);

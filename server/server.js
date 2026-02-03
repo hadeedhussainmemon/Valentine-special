@@ -1,10 +1,17 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const { v4: uuidv4 } = require('uuid');
-const { connectDB, Proposal } = require('./database');
-const path = require('path');
-const fs = require('fs');
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import { v4 as uuidv4 } from 'uuid';
+import { connectDB, Proposal } from './database.js';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+dotenv.config();
+
+// Fix __dirname for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,14 +19,18 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Connect to Database (Optimized for Serverless)
-// No top-level await here to avoid blocking cold start unnecessarily
-
 // 0. Health Check & DB Test
 app.get('/api/test', async (req, res) => {
     try {
         await connectDB();
-        const state = mongoose.connection.readyState; // 1 = connected
+        // Access mongoose from the exported connectDB context if needed, 
+        // or import mongoose globally. 
+        // Checking readyState from the connection object returned would be cleaner,
+        // but importing mongoose is fine too.
+        // Let's import mongoose locally to check state since 'connectDB' returns the connection.
+        const conn = await connectDB();
+        const state = conn.connection ? conn.connection.readyState : conn.readyState;
+
         const stateMap = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
         res.json({
             status: 'ok',
@@ -36,7 +47,7 @@ app.get('/api/test', async (req, res) => {
     }
 });
 
-// 1. Create Proposal (Sender Name -> Link ID)
+// 1. Create Proposal
 app.post('/api/proposals', async (req, res) => {
     await connectDB();
     const { sender_name, custom_message } = req.body;
@@ -121,16 +132,16 @@ app.use(express.static(path.join(__dirname, '../dist')));
 
 // Catch-all to serve React app with Dynamic Meta Tags
 app.get('*', async (req, res) => {
-    await connectDB(); // Ensure DB is ready for meta tag injection
+    await connectDB();
     const filePath = path.join(__dirname, '../dist/index.html');
 
-    // Check if it's a proposal link
-    const match = req.path.match(/^\/p\/([a-zA-Z0-9-]+)$/);
-
-    // Ignore source maps to prevent 404/JSON parse errors
+    // Ignore source maps
     if (req.path.endsWith('.map')) {
         return res.status(404).end();
     }
+
+    // Check if it's a proposal link
+    const match = req.path.match(/^\/p\/([a-zA-Z0-9-]+)$/);
 
     if (match) {
         const proposalId = match[1];
@@ -170,11 +181,10 @@ app.get('*', async (req, res) => {
     res.sendFile(filePath);
 });
 
-// Export for Vercel
-module.exports = app;
+export default app;
 
-// Only listen if run directly (not required by Vercel)
-if (require.main === module) {
+// Only listen if run directly
+if (import.meta.url === `file://${process.argv[1]}`) {
     app.listen(PORT, () => {
         console.log(`Server running on port ${PORT}`);
     });
