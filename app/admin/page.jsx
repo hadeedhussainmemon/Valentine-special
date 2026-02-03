@@ -63,7 +63,7 @@ export default function AdminPage() {
 
     if (!isAuthenticated) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <div className="flex items-center justify-center min-h-screen bg-slate-100 p-4 m-4" style={{ fontFamily: 'Inter, sans-serif' }}>
                 <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full border border-slate-200">
                     <div className="flex justify-center mb-6">
                         <div className="bg-slate-900 p-3 rounded-lg">
@@ -164,7 +164,7 @@ export default function AdminPage() {
                                         <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs whitespace-nowrap">Sender Name</th>
                                         <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs whitespace-nowrap">Status</th>
                                         <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs text-center whitespace-nowrap">Interactions</th>
-                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs whitespace-nowrap">Mystery Reveal</th>
+                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs whitespace-nowrap">Recipient / Mystery</th>
                                         <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs hidden md:table-cell whitespace-nowrap">Device Info</th>
                                         <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs hidden md:table-cell whitespace-nowrap">Date</th>
                                     </tr>
@@ -225,17 +225,22 @@ export default function AdminPage() {
                                                     <td className="px-6 py-4 text-center">
                                                         <div className="inline-block relative">
                                                             <span className={`px-2.5 py-1 rounded-md text-xs font-bold block min-w-[30px] border ${stat.no_hover_count > 5
-                                                                    ? 'bg-rose-50 text-rose-600 border-rose-100 ring-2 ring-rose-100/50'
-                                                                    : stat.no_hover_count > 0
-                                                                        ? 'bg-blue-50 text-blue-600 border-blue-100'
-                                                                        : 'bg-slate-50 text-slate-500 border-slate-200'
+                                                                ? 'bg-rose-50 text-rose-600 border-rose-100 ring-2 ring-rose-100/50'
+                                                                : stat.no_hover_count > 0
+                                                                    ? 'bg-blue-50 text-blue-600 border-blue-100'
+                                                                    : 'bg-slate-50 text-slate-500 border-slate-200'
                                                                 }`}>
                                                                 {stat.no_hover_count}
                                                             </span>
                                                         </div>
                                                     </td>
                                                     <td className="px-6 py-4">
-                                                        {stat.mystery_name ? (
+                                                        {stat.recipient_name ? (
+                                                            <div className="flex items-center gap-2 text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 w-fit">
+                                                                <span>💌</span>
+                                                                <span className="font-medium text-xs">For: {stat.recipient_name}</span>
+                                                            </div>
+                                                        ) : stat.mystery_name ? (
                                                             <div className="flex items-center gap-2 text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 w-fit">
                                                                 <span>✨</span>
                                                                 <span className="font-medium text-xs">"{stat.mystery_name}"</span>

@@ -9,6 +9,7 @@ const API_URL = '/api';
 
 export default function Home() {
     const [name, setName] = useState('');
+    const [recipientName, setRecipientName] = useState('');
     const [message, setMessage] = useState('');
     const [link, setLink] = useState('');
     const [copied, setCopied] = useState(false);
@@ -20,6 +21,7 @@ export default function Home() {
         try {
             const res = await axios.post(`${API_URL}/proposals`, {
                 sender_name: name,
+                recipient_name: recipientName,
                 custom_message: message
             });
             const proposalId = res.data.id;
@@ -57,12 +59,29 @@ export default function Home() {
 
                 {!link ? (
                     <div className="flex flex-col gap-4">
-                        <input
-                            type="text"
-                            placeholder="Your Name (e.g., Pookie)"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                        />
+                        <div>
+                            <label className="block text-left text-sm font-bold text-[#800F2F] mb-1 ml-1" htmlFor="sender">Your Name</label>
+                            <input
+                                id="sender"
+                                type="text"
+                                placeholder="e.g. Harry"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="w-full p-3 rounded-xl border border-[#FFC5D3] focus:outline-none focus:border-[#FF4D6D] focus:ring-2 focus:ring-[#FFC5D3] transition-all bg-white/80"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-left text-sm font-bold text-[#800F2F] mb-1 ml-1" htmlFor="recipient">Their Name <span className="opacity-50 font-normal">(Optional)</span></label>
+                            <input
+                                id="recipient"
+                                type="text"
+                                placeholder="e.g. Sally"
+                                value={recipientName}
+                                onChange={(e) => setRecipientName(e.target.value)}
+                                className="w-full p-3 rounded-xl border border-[#FFC5D3] focus:outline-none focus:border-[#FF4D6D] focus:ring-2 focus:ring-[#FFC5D3] transition-all bg-white/80"
+                            />
+                        </div>
 
                         <textarea
                             placeholder="A secret message for them... 💌"
@@ -87,7 +106,11 @@ export default function Home() {
                     >
                         <div className="p-4 bg-white/50 rounded-xl border-2 border-[#FFC5D3] break-all">
                             <p className="text-sm opacity-70 mb-2">Send this to your cutie:</p>
-                            <p className="font-mono text-sm font-bold text-[#FF4D6D]">{link}</p>
+                            <p className="font-mono text-sm font-bold text-[#FF4D6D] mb-4">{link}</p>
+                            <div className="bg-[#FFF0F3] p-2 rounded-lg text-xs text-[#800F2F] border border-[#FFB3C6] flex items-start gap-2 text-left">
+                                <span>💡</span>
+                                <span><strong>Tip:</strong> Save this link! Visit it later to see if they said YES! 💌</span>
+                            </div>
                         </div>
                         <button
                             className="btn btn-secondary flex items-center justify-center gap-2"

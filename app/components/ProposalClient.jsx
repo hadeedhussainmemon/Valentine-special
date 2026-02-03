@@ -54,6 +54,8 @@ export default function ProposalClient({ id }) {
     const [proposal, setProposal] = useState(null);
     const [loading, setLoading] = useState(true);
     const [accepted, setAccepted] = useState(false);
+    const [showNameModal, setShowNameModal] = useState(false);
+    const [enteredName, setEnteredName] = useState('');
     const [noCount, setNoCount] = useState(0);
     const [noPosition, setNoPosition] = useState({ x: 0, y: 0 });
 
@@ -93,7 +95,16 @@ export default function ProposalClient({ id }) {
     };
 
     const handleYes = () => {
+        setShowNameModal(true);
+    };
+
+    const confirmAcceptance = () => {
+        setShowNameModal(false);
         setAccepted(true);
+
+        // Update local state so the success screen shows the name immediately
+        setProposal(prev => ({ ...prev, mystery_name: enteredName }));
+
         confetti({
             particleCount: 150,
             spread: 70,
@@ -103,7 +114,9 @@ export default function ProposalClient({ id }) {
         if (audioRef.current && !isPlaying) {
             audioRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
         }
-        axios.post(`${API_URL}/proposals/${id}/accept`, {}).catch(console.error);
+
+        // Send the entered name as 'mystery_name'
+        axios.post(`${API_URL}/proposals/${id}/accept`, { mystery_name: enteredName }).catch(console.error);
     };
 
     if (loading) return <div className="flex h-screen items-center justify-center text-[#FF4D6D] text-2xl font-bold font-fredoka">Loading Cuteness... 🧸</div>;
@@ -132,7 +145,10 @@ export default function ProposalClient({ id }) {
                             animate={{ scale: 1, opacity: 1 }}
                             className="glass-card w-full text-center flex flex-col items-center"
                         >
-                            <h1 className="text-4xl md:text-6xl mb-4 text-[#FF4D6D] drop-shadow-sm font-bold">Will you be my Valentine?</h1>
+                            <h1 className="text-4xl md:text-6xl mb-4 text-[#FF4D6D] drop-shadow-sm font-bold">
+                                {proposal.recipient_name ? `Hey ${proposal.recipient_name}, ` : ''}
+                                Will you be my Valentine?
+                            </h1>
                             <p className="mb-6 text-[#800F2F] text-lg font-medium opacity-80">Official invite from {proposal.sender_name} 💌</p>
 
                             <img
@@ -275,7 +291,11 @@ export default function ProposalClient({ id }) {
                         className="flex items-center justify-center min-h-screen px-4 z-10 relative"
                     >
                         <div className="glass-card max-w-lg w-full text-center border-4 border-[#FFC5D3]">
-                            <h1 className="text-5xl mb-4 text-[#FF4D6D] font-bold">Good choice babu 😌</h1>
+                            <h1 className="text-5xl mb-4 text-[#FF4D6D] font-bold">
+                                {proposal.mystery_name || proposal.recipient_name
+                                    ? `Yay! ${proposal.mystery_name || proposal.recipient_name} said YES! 💖`
+                                    : "Good choice babu 😌"}
+                            </h1>
                             <p className="text-[#800F2F] text-xl mb-8">You just unlocked unlimited hugs, kisses, and cuddles!</p>
 
                             <div className="flex justify-center gap-4 mb-8">
@@ -311,6 +331,46 @@ export default function ProposalClient({ id }) {
                                 </div>
                             </div>
                         </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Name Input Modal */}
+            <AnimatePresence>
+                {showNameModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl border-4 border-[#FFC5D3] text-center"
+                        >
+                            <h3 className="text-2xl font-bold text-[#FF4D6D] mb-4">Wait! One last thing... 👀</h3>
+                            <p className="text-[#800F2F] mb-6">What should I call you? (So I know who accepted!)</p>
+
+                            <input
+                                autoFocus
+                                type="text"
+                                placeholder="Your Name (e.g. Alex)"
+                                value={enteredName}
+                                onChange={(e) => setEnteredName(e.target.value)}
+                                className="w-full p-4 bg-[#FFF0F3] border-2 border-[#FFB3C6] rounded-xl text-center text-lg font-bold text-[#FF4D6D] focus:outline-none focus:border-[#FF4D6D] mb-6 placeholder:text-[#FFB3C6] placeholder:font-normal"
+                                onKeyDown={(e) => e.key === 'Enter' && enteredName.trim() && confirmAcceptance()}
+                            />
+
+                            <button
+                                onClick={confirmAcceptance}
+                                disabled={!enteredName.trim()}
+                                className="w-full btn btn-primary py-4 text-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Confirm & Say YES! 💖
+                            </button>
+                        </motion.div>
                     </motion.div>
                 )}
             </AnimatePresence>
