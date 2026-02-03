@@ -15,6 +15,27 @@ app.use(express.json());
 // Connect to Database (Optimized for Serverless)
 // No top-level await here to avoid blocking cold start unnecessarily
 
+// 0. Health Check & DB Test
+app.get('/api/test', async (req, res) => {
+    try {
+        await connectDB();
+        const state = mongoose.connection.readyState; // 1 = connected
+        const stateMap = { 0: 'disconnected', 1: 'connected', 2: 'connecting', 3: 'disconnecting' };
+        res.json({
+            status: 'ok',
+            message: 'Server is running!',
+            db_state: stateMap[state] || state,
+            env_check: process.env.MONGODB_URI ? 'URI Found' : 'URI Missing'
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Database connection failed',
+            error: error.message
+        });
+    }
+});
+
 // 1. Create Proposal (Sender Name -> Link ID)
 app.post('/api/proposals', async (req, res) => {
     await connectDB();
@@ -105,6 +126,11 @@ app.get('*', async (req, res) => {
 
     // Check if it's a proposal link
     const match = req.path.match(/^\/p\/([a-zA-Z0-9-]+)$/);
+
+    // Ignore source maps to prevent 404/JSON parse errors
+    if (req.path.endsWith('.map')) {
+        return res.status(404).end();
+    }
 
     if (match) {
         const proposalId = match[1];
