@@ -155,74 +155,95 @@ export default function AdminPage() {
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+                    {/* Professional Data Table */}
+                    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm">
-                                <thead className="bg-slate-50 border-b border-slate-200">
-                                    <tr>
-                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Sender Name</th>
-                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Status</th>
-                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs text-center">Interactions</th>
-                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs">Reveal Name</th>
-                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs hidden md:table-cell">Device Info</th>
-                                        <th className="px-6 py-4 font-semibold text-slate-500 uppercase tracking-wider text-xs hidden md:table-cell">CREATED AT</th>
+                            <table className="w-full text-left text-sm border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-50 border-b border-slate-200">
+                                        <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs whitespace-nowrap">Sender Name</th>
+                                        <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs whitespace-nowrap">Status</th>
+                                        <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs text-center whitespace-nowrap">Interactions</th>
+                                        <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs whitespace-nowrap">Mystery Reveal</th>
+                                        <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs hidden md:table-cell whitespace-nowrap">Device Info</th>
+                                        <th className="px-6 py-4 font-semibold text-slate-600 uppercase tracking-wider text-xs hidden md:table-cell whitespace-nowrap">Date</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {stats.length === 0 ? (
                                         <tr>
                                             <td colSpan="6" className="px-6 py-12 text-center text-slate-400">
-                                                <Search size={32} className="mx-auto mb-3 opacity-20" />
-                                                No data found
+                                                <div className="flex flex-col items-center">
+                                                    <Search size={32} className="mb-3 opacity-20" />
+                                                    <p>No proposals found yet.</p>
+                                                </div>
                                             </td>
                                         </tr>
                                     ) : (
                                         stats.map((stat) => (
-                                            <tr key={stat.id} className="hover:bg-slate-50 transition-colors">
-                                                <td className="px-6 py-4 font-medium text-slate-900 font-sans">
-                                                    {stat.sender_name}
-                                                    <div className="text-xs text-slate-400 font-mono mt-0.5">{stat.id}</div>
+                                            <tr key={stat.id} className="hover:bg-slate-50 transition-colors group">
+                                                <td className="px-6 py-4">
+                                                    <div className="flex flex-col">
+                                                        <span className="font-medium text-slate-900 group-hover:text-blue-600 transition-colors">{stat.sender_name}</span>
+                                                        <span className="text-[10px] text-slate-400 font-mono mt-0.5 select-all">{stat.id}</span>
+                                                    </div>
                                                 </td>
                                                 <td className="px-6 py-4">
                                                     {stat.is_accepted ? (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
                                                             Accepted
                                                         </span>
                                                     ) : (
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-100">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
                                                             Pending
                                                         </span>
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 text-center">
-                                                    <span className={`font-mono font-semibold ${stat.no_hover_count > 0 ? 'text-red-600' : 'text-slate-300'}`}>
-                                                        {stat.no_hover_count}
-                                                    </span>
+                                                    <div className="flex items-center justify-center gap-2">
+                                                        <span className={`px-2 py-1 rounded-md text-xs font-bold w-12 text-center ${stat.no_hover_count > 0
+                                                                ? 'bg-rose-50 text-rose-600 border border-rose-100'
+                                                                : 'bg-slate-100 text-slate-500'
+                                                            }`}>
+                                                            {stat.no_hover_count}
+                                                        </span>
+                                                    </div>
                                                 </td>
-                                                <td className="px-6 py-4">
+                                                <td className="px-6 py-4 cursor-default">
                                                     {stat.mystery_name ? (
-                                                        <span className="text-slate-900 font-medium">"{stat.mystery_name}"</span>
+                                                        <div className="flex items-center gap-2 text-slate-700 bg-slate-50 px-2 py-1 rounded border border-slate-100 w-fit">
+                                                            <span>✨</span>
+                                                            <span className="font-medium">"{stat.mystery_name}"</span>
+                                                        </div>
                                                     ) : (
-                                                        <span className="text-slate-300 italic">Not revealed</span>
+                                                        <span className="text-slate-300 text-xs italic pl-2">Waiting...</span>
                                                     )}
                                                 </td>
-                                                <td className="px-6 py-4 hidden md:table-cell text-slate-500 truncate max-w-[200px]" title={stat.device_type}>
-                                                    <div className="flex items-center gap-2">
-                                                        <Smartphone size={14} className="text-slate-300" />
-                                                        {stat.device_type ? stat.device_type.split('(')[0].trim() : '-'}
+                                                <td className="px-6 py-4 hidden md:table-cell">
+                                                    <div className="flex items-center gap-2 text-slate-500 text-xs bg-white border border-slate-100 rounded px-2 py-1 w-fit shadow-sm">
+                                                        <Smartphone size={12} className="text-slate-400" />
+                                                        <span className="max-w-[150px] truncate" title={stat.device_type}>
+                                                            {stat.device_type ? stat.device_type.split('(')[0].trim() : 'Unknown'}
+                                                        </span>
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 hidden md:table-cell text-slate-500">
-                                                    <div className="flex items-center gap-2">
-                                                        <Calendar size={14} className="text-slate-300" />
-                                                        {new Date(stat.created_at).toLocaleDateString()}
-                                                    </div>
+                                                <td className="px-6 py-4 hidden md:table-cell text-slate-500 text-xs">
+                                                    {new Date(stat.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                                 </td>
                                             </tr>
                                         ))
                                     )}
                                 </tbody>
                             </table>
+                        </div>
+                        <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 text-xs text-slate-500 flex justify-between items-center">
+                            <span>Showing {stats.length} records</span>
+                            <div className="flex gap-2">
+                                <button className="px-2 py-1 bg-white border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50" disabled>Prev</button>
+                                <button className="px-2 py-1 bg-white border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50" disabled>Next</button>
+                            </div>
                         </div>
                     </div>
                 </div>
