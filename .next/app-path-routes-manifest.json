@@ -1,0 +1,13 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/admin/page": "/admin",
+  "/api/admin/stats/route": "/api/admin/stats",
+  "/api/proposals/[id]/accept/route": "/api/proposals/[id]/accept",
+  "/api/proposals/[id]/interaction/route": "/api/proposals/[id]/interaction",
+  "/api/proposals/[id]/route": "/api/proposals/[id]",
+  "/api/proposals/route": "/api/proposals",
+  "/api/test/route": "/api/test",
+  "/p/[id]/page": "/p/[id]",
+  "/page": "/"
+}

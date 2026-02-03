@@ -1,0 +1,13 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/api/admin/stats/route": "app/api/admin/stats/route.js",
+  "/api/proposals/[id]/accept/route": "app/api/proposals/[id]/accept/route.js",
+  "/api/proposals/[id]/interaction/route": "app/api/proposals/[id]/interaction/route.js",
+  "/api/proposals/[id]/route": "app/api/proposals/[id]/route.js",
+  "/api/proposals/route": "app/api/proposals/route.js",
+  "/api/test/route": "app/api/test/route.js",
+  "/p/[id]/page": "app/p/[id]/page.js",
+  "/page": "app/page.js"
+}
