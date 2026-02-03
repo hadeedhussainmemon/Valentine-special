@@ -54,11 +54,12 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 className="glass-card"
             >
-                <Heart className="w-20 h-20 text-primary mx-auto mb-2 animate-pulse drop-shadow-lg" color="#FF4D6D" fill="#FF4D6D" strokeWidth={1.5} size={80} />
-                <h1>HeartString</h1>
-                <p className="mb-6 font-light italic text-lg opacity-90">"Because every love story deserves a beautiful beginning."</p>
+                <Heart className="w-24 h-24 text-white mx-auto mb-4 animate-pulse drop-shadow-xl" color="#fff" fill="#D4145A" strokeWidth={0} size={90} />
+                <h1 className="text-7xl md:text-8xl mb-4 font-romantic">HeartString</h1>
+                <p className="mb-8 font-light italic text-2xl opacity-90 tracking-wide font-serif">"Because every love story deserves a beautiful beginning."</p>
 
-                <p className="mb-4 text-sm uppercase tracking-widest opacity-70">create your proposal</p>
+                <div className="h-px w-32 bg-white/40 mx-auto mb-8"></div>
+                <p className="mb-6 text-sm uppercase tracking-[0.3em] opacity-80 font-bold">Create Your Proposal</p>
 
                 {!link ? (
                     <div className="flex flex-col gap-4">
