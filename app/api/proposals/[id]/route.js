@@ -6,7 +6,9 @@ export const dynamic = 'force-dynamic';
 export async function GET(request, { params }) {
     try {
         await connectDB();
+        // Next.js 15: params is a Promise, must be awaited
         const { id } = await params;
+
         const proposal = await Proposal.findOne({ id });
 
         if (!proposal) {

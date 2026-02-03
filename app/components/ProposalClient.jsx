@@ -7,13 +7,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Volume2, VolumeX } from 'lucide-react';
 
 const API_URL = '/api';
-// Romantic Piano Music
-// Romantic Piano Music - reliable hosting
 const MUSIC_URL = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3";
 
 export default function ProposalClient({ id }) {
     const [proposal, setProposal] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [noCount, setNoCount] = useState(0);
     const [accepted, setAccepted] = useState(false);
     const [noPosition, setNoPosition] = useState({ x: 0, y: 0 });
@@ -25,24 +24,37 @@ export default function ProposalClient({ id }) {
     const [isPlaying, setIsPlaying] = useState(false);
 
     useEffect(() => {
-        // Initialize Audio only on client
+        // Initialize Audio
         audioRef.current = new Audio(MUSIC_URL);
+        audioRef.current.loop = true;
+        audioRef.current.volume = 0.5;
 
         const fetchProposal = async () => {
             try {
+                // Ensure ID is valid before request
+                if (!id) throw new Error("No ID provided");
+
                 const res = await axios.get(`${API_URL}/proposals/${id}`);
                 setProposal(res.data);
+
                 if (res.data.is_accepted) {
                     setAccepted(true);
                     setSubmittedName(!!res.data.mystery_name);
                 }
-            } catch (error) {
-                console.error('Error fetching proposal:', error);
+            } catch (err) {
+                console.error('Error fetching proposal:', err);
+                setError(err.response?.data?.error || err.message);
             } finally {
                 setLoading(false);
             }
         };
-        fetchProposal();
+
+        if (id) {
+            fetchProposal();
+        } else {
+            setLoading(false);
+            setError("Invalid Link ID");
+        }
 
         return () => {
             if (audioRef.current) {
@@ -57,7 +69,7 @@ export default function ProposalClient({ id }) {
         if (isPlaying) {
             audioRef.current.pause();
         } else {
-            audioRef.current.play().catch(e => console.log("Audio play failed", e));
+            audioRef.current.play().catch(e => console.log("User must interact first", e));
         }
         setIsPlaying(!isPlaying);
     };
@@ -82,8 +94,8 @@ export default function ProposalClient({ id }) {
             colors: ['#FF4D6D', '#FF8FA3', '#FFFFFF']
         });
 
-        if (!isPlaying && audioRef.current) {
-            audioRef.current.play().then(() => setIsPlaying(true)).catch(() => { });
+        if (audioRef.current && !isPlaying) {
+            audioRef.current.play().then(() => setIsPlaying(true)).catch(e => console.log(e));
         }
 
         try {
@@ -106,8 +118,15 @@ export default function ProposalClient({ id }) {
         }
     };
 
-    if (loading) return <div className="text-white text-center mt-20">Loading magic... ✨</div>;
-    if (!proposal) return <div className="text-white text-center mt-20">Proposal not found 💔</div>;
+    if (loading) return <div className="text-white text-center mt-20 text-2xl animate-pulse">Loading magic... ✨</div>;
+
+    if (error || !proposal) return (
+        <div className="text-white text-center mt-20">
+            <h1 className="text-4xl mb-4">💔</h1>
+            <p className="text-xl">Proposal not found or expired.</p>
+            <p className="text-sm opacity-50 mt-2">{error}</p>
+        </div>
+    );
 
     const noScale = Math.max(0.5, 1 - noCount * 0.1);
     const yesScale = Math.min(2, 1 + noCount * 0.2);
@@ -117,7 +136,7 @@ export default function ProposalClient({ id }) {
             <button
                 onClick={toggleMusic}
                 className="absolute top-4 right-4 z-50 p-3 bg-white/20 rounded-full hover:bg-white/30 transition-all backdrop-blur-md border border-white/20"
-                title="Play Romantic Music"
+                title={isPlaying ? "Pause Music" : "Play Music"}
             >
                 {isPlaying ? <Volume2 className="text-white animate-pulse" /> : <VolumeX className="text-white/70" />}
             </button>
@@ -207,11 +226,12 @@ export default function ProposalClient({ id }) {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Background Animations */}
             <Heart className="heart" style={{ left: '10%', animationDelay: '0s' }} size={30} />
             <Heart className="heart" style={{ left: '30%', animationDelay: '2s' }} size={40} />
             <Heart className="heart" style={{ left: '70%', animationDelay: '4s' }} size={25} />
             <Heart className="heart" style={{ left: '90%', animationDelay: '1s' }} size={35} />
-
             <div className="unicorn" style={{ animationDelay: '0s', left: '10%' }}>🦄</div>
             <div className="unicorn" style={{ animationDelay: '5s', left: '50%' }}>🦄</div>
         </div>

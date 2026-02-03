@@ -27,15 +27,7 @@ export default function Home() {
             setLink(fullLink);
         } catch (error) {
             console.error('Error creating link:', error);
-            let errorMsg = 'Unknown error';
-            if (error.response?.data?.error) {
-                errorMsg = typeof error.response.data.error === 'object'
-                    ? JSON.stringify(error.response.data.error)
-                    : error.response.data.error;
-            } else if (error.message) {
-                errorMsg = error.message;
-            }
-            alert(`Failed to create link: ${errorMsg}`);
+            alert('Failed to create link. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -84,11 +76,6 @@ export default function Home() {
                         >
                             {loading ? 'Creating...' : 'Create Magic Link ✨'}
                         </button>
-
-                        <p className="text-xs opacity-60 mt-2">
-                            <MessageCircleHeart size={14} className="inline mr-1" />
-                            Tip: Add a date or location in the secret note!
-                        </p>
                     </div>
                 ) : (
                     <motion.div
