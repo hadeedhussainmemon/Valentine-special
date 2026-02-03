@@ -114,13 +114,15 @@ app.get('*', async (req, res) => {
 
                     const title = `${proposal.sender_name} has a question for you... 💌`;
                     const description = "Tap to see the surprise! 💘";
+                    const imageUrl = `${req.protocol}://${req.get('host')}/og-image.png`;
 
                     const result = data
                         .replace('<title>HeartString 💘</title>', `<title>${title}</title>`)
                         .replace('</head>', `
                             <meta property="og:title" content="${title}" />
                             <meta property="og:description" content="${description}" />
-                            <meta property="og:image" content="https://img.freepik.com/free-vector/pixel-heart_24908-59424.jpg" /> 
+                            <meta property="og:image" content="${imageUrl}" />
+                            <meta name="twitter:card" content="summary_large_image">
                             </head>`);
 
                     res.send(result);
